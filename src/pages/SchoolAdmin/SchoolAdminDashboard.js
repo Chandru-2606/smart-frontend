@@ -16,7 +16,7 @@ function SchoolAdminDashboard() {
     { name: "Dashboard", link: "/", icon: <DashboardOutlined />, component: <Dashboard /> },
     { name: "Create Students", link: "createStudents", icon: <CreditScoreIcon />, component: <CreateStudents /> },
     { name: "Students", link: "students", icon: <PersonOutlineIcon />, component: < StudentFormDialog/> },
-    // { name: "Recharge", link: "recharge", icon: <MonetizationOnIcon />, component: <Recharge /> },
+    { name: "Recharge", link: "recharge", icon: <MonetizationOnIcon />, component: <Recharge /> },
     { name: "Transactions", link: "transactions", icon: <CreditScoreIcon />, component: <Transactions /> },
   ];
   return (

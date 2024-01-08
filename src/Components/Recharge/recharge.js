@@ -27,11 +27,12 @@ function Recharge() {
     { field: 'balance', headerName: 'Balance', flex: 1 },
     {
       field: 'edit',
-      headerName: 'Action',
+      headerName: 'Recharge',
       sortable: false,
       filterable: false,
       width: 80,
       disableClickEventBubbling: true,
+      flex:1,
       renderCell: (params) => {
         return (
           <Button
@@ -53,15 +54,6 @@ function Recharge() {
       // const response = await getRecharge();
       const response = await getStudentBySchool(user.school)
       console.log(response.data);
-      // const rechargeData = response.data;
-      // const studentDetailsPromises = rechargeData.map(async (recharge) => {
-      //   const studentResponse = await getStudentByID(recharge.student);
-      //   return { ...recharge, studentDetails: studentResponse.data };
-      // });
-      // const mergedData = await Promise.all(studentDetailsPromises);
-      // const filtered = mergedData.filter((item) => {
-      //   return item.studentDetails.school === user.school;
-      // });
       setTimeout(() => {
         setLoading(false);
         setMergedData(response.data);
@@ -81,7 +73,6 @@ function Recharge() {
       setEditDialogOpen(true);
       setLoading(false)
     },250)
-    
   };
 
   const handleEditDialogClose = () => {
@@ -95,12 +86,10 @@ console.log(selectedStudent);
     try{
       let updatedTransaction ={ amount : Number(editAmount), student:selectedRow._id, transactionType:'recharge'}
       const studentResponse = await updateStudent(selectedStudent, {balance:total})
-      console.log(studentResponse);
       const transactionResponse = await createTransactions(updatedTransaction)
-      console.log(transactionResponse);
       fetchRechargeAndMerge()
     }catch(error){
-      console.log(error)
+      enqueueSnackbar({message: error.message, variant: 'error'})
     }
   };
 

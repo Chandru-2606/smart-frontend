@@ -8,10 +8,12 @@ import UserList from '../../Components/Users/users';
 import SchoolList from '../../Components/Schools/schools';
 import SchoolIcon from '@mui/icons-material/School';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import AllStudents from '../../Components/AllStudents/allStudents';
 function SuperAdminDashboard() {
   const SuperAdminRoute = [
     { name: "Dashboard", link: "/", icon: <DashboardOutlined />, component: <Dashboard /> },
     { name: "Users", link: "users", icon: <PeopleAltIcon />, component: <UserList /> },
+    { name: "Students", link: "students", icon: <SchoolIcon />, component: <AllStudents /> },
     { name: "Schools", link: "schools", icon: <SchoolIcon />, component: <SchoolList /> },
   ];
 

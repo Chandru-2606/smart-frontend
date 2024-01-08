@@ -16,7 +16,6 @@
   import { SnackbarProvider, enqueueSnackbar  } from "notistack";
   import AddIcon from '@mui/icons-material/Add';
   import StudentForm from "../Student/subComponent/studentsDetail";
-  import Loader from "../Loader/loader";
   const CreateStudents = () => {
     const [schoolId, setSchoolId] = useState("");
     const [csvData, setCsvData] = useState([]);
@@ -27,14 +26,9 @@
 
 
     const userData = async () => {
-      setLoading(true)
       try {
         const response = await tokenValidation();
-        setTimeout(()=>{
-          setLoading(false)
-          setSchoolId(response.data.school);
-        },250)
-        
+        setSchoolId(response.data.school);
       } catch (error) {
         enqueueSnackbar({message:error.message, variant:'error'})
       }
@@ -46,7 +40,6 @@
     const handleFileUpload = (e) => {
       const file = e.target.files[0];
       if (file) {
-        setLoading(true);
         const reader = new FileReader();
         reader.onload = (event) => {
           const result = event.target.result;
@@ -63,20 +56,18 @@
       setLoading(true);
       Papa.parse(csvString, {
         complete: (result) => {
-          console.log("Parsed CSV Result:", result);
-          const parsedRows = result.data
-            .filter((row) => Object.values(row).every((value) => value))
-            .map((row, index) => {
-              const { name, rfidCardId, balance } = row;
-              return {
-                id: `row_${index + 1}`,
-                name,
-                rfidCardId,
-                balance,
-                school: schoolId,
-              };
-            });
-          setCsvData(parsedRows);
+          const processedRows = result.data.map((row, index) => ({
+            id: `row_${index + 1}`,
+            name: row.name,
+            rfidCardId: row.rfidCardId,
+            // balance: row.balance,
+            school: schoolId,
+          }));
+    
+          const filteredRows = processedRows.filter(
+            (row) => Object.values(row).every((value) => value !== undefined && value !== null && value !== "")
+          );
+          setCsvData(filteredRows);
           setLoading(false);
         },
         header: true,
@@ -94,9 +85,8 @@
 
         for (let lead of csvData) {
           const { id, ...leadWithoutId } = lead;
-          leadWithoutId.balance = Number(lead.balance);
+          // leadWithoutId.balance = leadWithoutId.balance ? Number(leadWithoutId.balance) : Number(lead.balance) || 0;
           leadWithoutId.school = schoolId;
-          console.log(leadWithoutId);
           try {
             const response = await createStudent(leadWithoutId);
             if (response.success) {
@@ -105,7 +95,6 @@
               failedLeads.push(lead);
             }
           } catch (error) {
-            console.error(`Error creating student ${lead.name}:`, error.message);
             failedLeads.push(lead);
           }
           setSuccessfulLeads((prevCount) => prevCount + 1);
@@ -114,15 +103,12 @@
         enqueueSnackbar({message:'Students Created', variant:'success'})
       } catch (error) {
         enqueueSnackbar({message:error.message, variant:'error'})
-      } finally {
-        setLoading(false); 
-      }
+      } 
     };
 
     const columns = [
       { field: 'name', headerName: 'Name', flex: 1 },
       { field: 'rfidCardId', headerName: 'RFID Card ID', flex: 1 },
-      { field: 'balance', headerName: 'Balance', flex: 1 },
     ];
     const rows = csvData;
 
@@ -154,7 +140,7 @@
           </Box>
         
         {loading && <CircularProgress />}
-        <div style={{ height: "auto", width: "100%", margin:'10px' }}>
+        <div style={{ height: 400, width: "100%" }}>
           {csvData.length > 0 ? (
             <DataGrid
               rows={rows}
@@ -175,8 +161,9 @@
         >
           Submit
         </Button>
+
+      
         <StudentForm open={open} setOpen={setOpen} schoolId={schoolId} />
-        <Loader loading={loading} />
       </Box>
       </SnackbarProvider>
     );

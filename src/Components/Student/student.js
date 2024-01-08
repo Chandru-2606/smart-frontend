@@ -24,7 +24,7 @@ export default function StudentFormDialog() {
   const [selectedStudent, setSelectedStudent] = useState([]);
   const [selectedContact, setSelectedContact] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [contacts, setContacts] = useState([])
+  const [contacts, setContacts] = useState([]);
   const [selectedStudentId, setSelectedStudentId]= useState('')
   const [open, setOpen] = React.useState(false);
   const [contactOpen, setContactOpen] = useState(false);
@@ -149,7 +149,7 @@ const createContacts =(id)=>{
         height: "auto",ml: {md: "240px",sm: "240px",xs: "0px",lg: "240px",},}}>
       <Box sx={{ p: 3 }}>
         <Box sx={{ display: "flex", justifyContent: "flex-end", mb:3, width:'100%' }}>
-          <Box  >
+          <Box>
             <TextField label='Search Student' sx={{mr:2}} onChange={(e)=> functionChange(e)} />
           </Box>
         </Box>

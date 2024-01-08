@@ -17,6 +17,15 @@ const getSchools =async()=>{
     }
 }
 
+const getSchoolById = async(id)=>{
+    try {
+        const response = await apiClient().get(`/school/${id}`)
+        return response
+    } catch (error) {
+        throw error
+    }
+}
+
 const updateSchool = async(id, payload)=>{
     try {
         const response = await apiClient().put(`/school/${id}`, payload)
@@ -42,4 +51,4 @@ const getStudentBySchool = async(id)=>{
         throw error
     }
 }
-export {getSchools, updateSchool, deleteSchool, createSchool, getStudentBySchool}
+export {getSchools, updateSchool, deleteSchool, createSchool, getStudentBySchool,getSchoolById}
