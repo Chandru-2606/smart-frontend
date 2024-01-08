@@ -1,3 +1,3 @@
 export default {
-    baseURL: 'http://localhost:3001/api/v1',
+    baseURL: 'https://vercel.com/chandru-2606/smart-backend/api/v1',
 }
