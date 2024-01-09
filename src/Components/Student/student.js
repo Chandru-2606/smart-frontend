@@ -36,9 +36,13 @@ export default function StudentFormDialog() {
       const response = await tokenValidation()
       setSchoolId(response.data.school)
       const responseStudent = await getStudentBySchool(response.data.school)
+      const studentsWithBalance = responseStudent.data.map((student) => ({
+        ...student,
+        balance: student.balance || 0,
+      }));
       setTimeout(()=>{
-        setStudentsData(responseStudent.data)
-        setCopyStudent(responseStudent.data)
+        setStudentsData(studentsWithBalance)
+        setCopyStudent(studentsWithBalance)
         setLoading(false)
       },250)
     }catch(error){

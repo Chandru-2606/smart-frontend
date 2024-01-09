@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react';
-// import { Box, DataGrid } from '@mui/x-data-grid';
-import { Box, TextField, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import { Box, TextField, Select, MenuItem, InputLabel, FormControl, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { getStudents } from '../../Api/student';
 import { getSchoolById, getSchools } from '../../Api/schools';
+import EditIcon from '@mui/icons-material/Edit';
+import {IconButton} from '@mui/material';
+import Loader from '../Loader/loader';
 
 function AllStudents() {
   const [students, setStudents] = useState([]);
   const [copyStudents, setCopyStudents] = useState([])
   const [schools, setSchools] = useState([]);
   const [selectedSchool, setSelectedSchool] = useState('');
-
+  const [loading, setLoading] = useState(false)
 
   const fetchStudents = async () => {
+    setLoading(true)
     try {
       const studentsResponse = await getStudents();
       if (studentsResponse.data) {
@@ -25,13 +28,16 @@ function AllStudents() {
               const schoolInfo = schoolResponse.data;
               return {
                 ...student,
-                schoolName: schoolInfo.name, // Flatten the school name
+                schoolName: schoolInfo.name, 
+                balance: student.balance || 0,
               };
             })
           );
-  
+          setTimeout(()=>{
           setStudents(studentsWithSchools);
           setCopyStudents(studentsWithSchools)
+          setLoading(false)
+        },250)
         }
       }
     } catch (error) {
@@ -39,7 +45,6 @@ function AllStudents() {
     }
   };
   
-
   useEffect(() => {
     fetchStudents();
   }, []);
@@ -51,51 +56,42 @@ function AllStudents() {
     })
     setStudents(filtered)
   }
-
+ const handleRecharge =(id)=>{
+console.log(id);
+ }
   const columns = [
     { field: 'name', headerName: 'Name', flex: 1 },
     { field: 'rfidCardId', headerName: 'RFID Card ID', flex: 1 },
     { field: 'balance', headerName: 'Balance', flex: 1 },
     { field: 'schoolName', headerName: 'School Name', flex: 1 },
+    {field: 'edit',headerName: 'Recharge',flex: 0.5,renderCell: (params) => (
+        <IconButton onClick={() => handleRecharge(params.row._id)}>
+          <EditIcon  />
+        </IconButton>
+      ),
+    },
   ];
   
-
   const handleSchoolChange = (event) => {
+    setLoading(true)
     setSelectedSchool(event.target.value);
     const filtered = copyStudents.filter((item)=> item.schoolName === event.target.value)
-    setStudents(filtered)
+    setTimeout(()=>{
+      setStudents(filtered)
+      setLoading(false)
+    },250)
   };
   return (
-    <Box
-      sx={{
-        width: {
-          md: "calc(100% - 240px)",
-          sm: "calc(100% - 240px)",
-          xs: "100%",
-          lg: "calc(100% - 240px)",
-        },
-        height: "auto",
-        ml: { md: "240px", sm: "240px", xs: "0px", lg: "240px" },
-      }}
-    >
+    <Box sx={{ width: { md: "calc(100% - 240px)", sm: "calc(100% - 240px)", xs: "100%", lg: "calc(100% - 240px)"},
+        height: "auto", ml: { md: "240px", sm: "240px", xs: "0px", lg: "240px" }}}>
       <Box sx={{ p: 3 }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            mb: 3,
-            width: "100%",gap:2
-          }}
-        >
+        <Box sx={{display:'flex', alignContent:'center', alignItems:'center'}} >
+          <Typography variant='h6' sx={{fontFamily: 'Poppins, sans-serif', fontWeight:'bolder'}}>Students</Typography>
+        <Box sx={{  display: "flex", justifyContent: "flex-end", mb: 3,width: "100%",gap:2}}>
           <FormControl sx={{width:"20%"}}>
             <InputLabel id="demo-simple-select-label">Select School</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              label="Select School"
-              value={selectedSchool}
-              onChange={handleSchoolChange}
-            >
+            <Select  labelId="demo-simple-select-label"  id="demo-simple-select"
+              label="Select School"  value={selectedSchool} onChange={handleSchoolChange}>
               {schools.map((school) => (
                 <MenuItem key={school._id} value={school.name}>
                   {school.name}
@@ -103,11 +99,8 @@ function AllStudents() {
               ))}
             </Select>
           </FormControl>
-          <TextField
-            label="Search Student"
-            sx={{ mr: 2 }}
-            onChange={(e) => functionChange(e)}
-          />
+          <TextField label="Search Student"  sx={{ mr: 2 }} onChange={(e) => functionChange(e)}/>
+        </Box>
         </Box>
         <Box style={{ height: "auto", width: "100%" }}>
           <DataGrid
@@ -115,9 +108,11 @@ function AllStudents() {
             columns={columns}
             pageSize={5}
             getRowId={(row) => row._id}
+            sx={{fontFamily: 'Poppins, sans-serif'}}
           />
         </Box>
       </Box>
+      <Loader loading={loading} />
     </Box>
   );
 }

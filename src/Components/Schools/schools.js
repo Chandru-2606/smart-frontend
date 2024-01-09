@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { Button, IconButton, Box } from '@mui/material';
+import { Button, IconButton, Box, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -116,25 +116,13 @@ const SchoolList = () => {
   return (
     <>
       <SnackbarProvider maxSnack={3} autoHideDuration={3000}>
-        <Box
-          sx={{
-            width: {
-              md: "calc(100% - 240px)",
-              sm: "calc(100% - 240px)",
-              xs: "100%",
-              lg: "calc(100% - 240px)",
-            },
-            height: "auto",
-            ml: { md: "240px", sm: "240px", xs: "0px", lg: "240px" },
-          }}
-        >
+      <Box sx={{ width: { md: "calc(100% - 240px)", sm: "calc(100% - 240px)", xs: "100%", lg: "calc(100% - 240px)"},
+        height: "auto", ml: { md: "240px", sm: "240px", xs: "0px", lg: "240px" }}}>
           <Box sx={{ p: 3, width:'100%' }}>
-            <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-              <Button
-                variant="contained"
-                onClick={handleCreateSchool}
-                sx={{ fontFamily: "Poppins, sans-serif" }}
-              >
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+              <Typography variant='h6' sx={{ fontFamily: "Poppins, sans-serif", fontWeight:'bolder' }} >Schools</Typography>
+              <Button variant="contained" sx={{ fontFamily: "Poppins, sans-serif" }}
+                onClick={handleCreateSchool} >
                 <AddIcon />
                 Create School
               </Button>

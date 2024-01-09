@@ -11,6 +11,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -124,7 +125,6 @@ const UserList = () => {
         try {
           const response = await createUsers(requestData);
           if (response.status === 201) {
-            // alert('New user created');
             enqueueSnackbar({ message: "User Created", variant: "success" });
             setTimeout(() => {
               setLoading(false);
@@ -181,25 +181,11 @@ const UserList = () => {
   return (
     <>
       <SnackbarProvider maxSnack={3} autoHideDuration={3000}>
-        <Box
-          sx={{
-            width: {
-              md: "calc(100% - 240px)",
-              sm: "calc(100% - 240px)",
-              xs: "100%",
-              lg: "calc(100% - 240px)",
-            },
-            height: "auto",
-            ml: {
-              md: "240px",
-              sm: "240px",
-              xs: "0px",
-              lg: "240px",
-            },
-          }}
-        >
+      <Box sx={{ width: { md: "calc(100% - 240px)", sm: "calc(100% - 240px)", xs: "100%", lg: "calc(100% - 240px)"},
+        height: "auto", ml: { md: "240px", sm: "240px", xs: "0px", lg: "240px" }}}>
           <Box sx={{ p: 3 }}>
-            <Box sx={{ mb: 2, display: "flex", justifyContent: "flex-end" }}>
+            <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between" }}>
+            <Typography variant="h6" sx={{ fontFamily: "Poppins, sans-serif" , fontWeight:'bolder'}}>Users</Typography>
               <Button
                 variant="contained"
                 onClick={handleCreateUser}
