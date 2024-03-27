@@ -2,7 +2,7 @@ import apiClient from "./http";
 
 const createContact = async (payload) => {
   try {
-    const response = await apiClient().post("/contact", payload);
+    const response = await apiClient().post("/getContacts", payload);
     return response;
   } catch (error) {
     throw error;
@@ -11,7 +11,7 @@ const createContact = async (payload) => {
 
 const getContacts = async (id) => {
     try {
-      const response = await apiClient().get(`/contact`);
+      const response = await apiClient().get(`/getContacts`);
       return response;
     } catch (error) {
       throw error;
@@ -29,7 +29,7 @@ const getContactById = async (id) => {
 
   const updateContact = async (id, payload) => {
     try {
-      const response = await apiClient().put(`/contact/${id}`, payload);
+      const response = await apiClient().put(`/getContacts/${id}`, payload);
       return response;
     } catch (error) {
       throw error;
@@ -38,8 +38,8 @@ const getContactById = async (id) => {
 
   const deleteContact = async (id)=>{
     try {
-        const response = await apiClient().delete(`/contact/${id}`)
-        return response
+        const response = await apiClient().delete(`/getContacts/${id}`)
+        return response;
     } catch (error) {
         throw error
     }

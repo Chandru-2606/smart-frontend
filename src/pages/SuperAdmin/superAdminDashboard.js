@@ -4,17 +4,21 @@ import Dashboard from './dashboard';
 import Navbar from '../../Components/navBar/navBar';
 import { Routes, Route } from 'react-router-dom';
 import { DashboardOutlined } from '@mui/icons-material';
-import UserList from '../../Components/Users/users';
-import SchoolList from '../../Components/Schools/schools';
+import UserList from './Users/UsersList';
+import SchoolList from './Schools/SchoolList';
 import SchoolIcon from '@mui/icons-material/School';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import AllStudents from '../../Components/AllStudents/allStudents';
+import DeviceList from './Devices/DeviceList';
+import TabletAndroidIcon from '@mui/icons-material/TabletAndroid';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import Config from './Config/Config';
 function SuperAdminDashboard() {
   const SuperAdminRoute = [
     { name: "Dashboard", link: "/", icon: <DashboardOutlined />, component: <Dashboard /> },
     { name: "Users", link: "users", icon: <PeopleAltIcon />, component: <UserList /> },
-    { name: "Students", link: "students", icon: <SchoolIcon />, component: <AllStudents /> },
     { name: "Schools", link: "schools", icon: <SchoolIcon />, component: <SchoolList /> },
+    { name: "Devices", link: "devices", icon: <TabletAndroidIcon />, component: <DeviceList /> },
+    { name: "Config", link: "config", icon: <AccountBalanceWalletIcon />, component: <Config /> },
   ];
 
   return (

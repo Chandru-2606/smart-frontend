@@ -14,6 +14,8 @@ import { Outlet } from "react-router-dom";
 import { Collapse } from "@mui/material";
 import { ArrowDropDownCircleOutlined } from "@mui/icons-material";
 import Appbar from "./appBar";
+import logo from '../../Images/logo.png'
+
 
 export default function Navbar({ data }) {
   const drawWidth = 240;
@@ -48,12 +50,11 @@ export default function Navbar({ data }) {
 
   const responsiveDrawer = (
     <div style={{ backgroundColor: "rgb(32,33,35)", height: "100%", fontFamily: 'Poppins, sans-serif' }}>
-      <Box sx={{height:'80px'}}></Box>
-      <Divider />
-      <Divider />
-      <Divider />
-      <Divider />
-
+       <img
+      src={logo}
+      style={{ maxWidth: '100%', height: 'auto', width: '50%', marginLeft:'30px' }}
+      alt="logo"
+    />
       <List>
         {data.map((item, index) => (
           <div key={index}>

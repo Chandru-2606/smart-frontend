@@ -19,7 +19,6 @@ function LoginForm() {
       if (response.status === 200) {
         localStorage.setItem('token', response.data.token);
         navigate('/superadmin');
-        console.log(response.data.user);
         localStorage.setItem('role', response.data.user.role);
         localStorage.setItem('user', JSON.stringify(response.data.user));
         enqueueSnackbar({ message: 'Logged In Successfully', variant: 'success' });
@@ -31,7 +30,8 @@ function LoginForm() {
         setLoading(false);
       }
     } catch (error) {
-      enqueueSnackbar({ message: error.message, variant: 'error' });
+      
+      enqueueSnackbar({ message: error.response.data.message, variant: 'error' });
       setLoading(false);
     }
   };

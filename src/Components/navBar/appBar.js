@@ -18,11 +18,14 @@ import PersonAdd from "@mui/icons-material/PersonAdd";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
+import Loader from "../Loader/loader";
 function Appbar({ handleToggle }) {
   const drawWidth = 240;
   const items = JSON.parse(localStorage.getItem('user'));
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [loading, setLoading] =  React.useState(false);
   const open = Boolean(anchorEl);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -31,9 +34,12 @@ function Appbar({ handleToggle }) {
   };
   const navigate = useNavigate()
   const handleLogout = () => {
-    localStorage.clear()
-    navigate('/')
-    
+    setLoading(true);
+    setTimeout(()=>{
+      localStorage.clear()
+      navigate('/')
+      setLoading(false);
+    }, 250)
   };
   return (
     <div>
@@ -54,7 +60,7 @@ function Appbar({ handleToggle }) {
             <MenuIcon />
           </IconButton>
           <Box sx={{display:"flex", justifyContent:"center", alignItems:"center", gap:2}}>
-            {/* <Typography variant="h6" sx={{color:"black",}}>Benaka Gold Company</Typography> */}
+            <Typography variant="h6" sx={{color:"black",}}>Organisation Name</Typography>
           </Box>
 
           <React.Fragment>
@@ -113,25 +119,6 @@ function Appbar({ handleToggle }) {
               transformOrigin={{ horizontal: "right", vertical: "top" }}
               anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
-              <MenuItem onClick={handleClose}>
-                <Avatar /> Profile
-              </MenuItem>
-              <MenuItem onClick={handleClose}>
-                <Avatar /> My account
-              </MenuItem>
-              <Divider />
-              <MenuItem onClick={handleClose}>
-                <ListItemIcon>
-                  <PersonAdd fontSize="small" />
-                </ListItemIcon>
-                Add another account
-              </MenuItem>
-              <MenuItem onClick={handleClose}>
-                <ListItemIcon>
-                  <Settings fontSize="small" />
-                </ListItemIcon>
-                Settings
-              </MenuItem>
               <MenuItem onClick={handleLogout}>
                 <ListItemIcon>
                   <Logout fontSize="small" />

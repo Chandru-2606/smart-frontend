@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import { Dialog, DialogTitle, DialogContent, TextField, Button } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 
-const SchoolFormDialog = ({ open, onClose, onSubmit, isCreateMode, selectedSchool }) => {
+const CreateSchoolDialog = ({ open, onClose, onSubmit, isCreateMode, selectedSchool }) => {
   const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
     defaultValues: isCreateMode ? {} : selectedSchool,
   });
@@ -77,4 +77,4 @@ const SchoolFormDialog = ({ open, onClose, onSubmit, isCreateMode, selectedSchoo
   );
 };
 
-export default SchoolFormDialog;
+export default CreateSchoolDialog;

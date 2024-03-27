@@ -1,19 +1,13 @@
 import React, {useState, useEffect} from 'react';
 import { createStudent, updateStudent } from '../../../Api/student';
 import {  enqueueSnackbar  } from "notistack";
-
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  Button,
-} from '@mui/material';
+import { Dialog,  DialogTitle, DialogContent, TextField, Button, Box} from '@mui/material';
 import { useForm } from 'react-hook-form';
 
 
-const StudentForm = ({ open, setOpen, onSubmit, schoolData, isEditMode, initialValues , AllStudents}) => {
+const StudentForm = ({ open, setOpen,  isEditMode, initialValues,fetchStudents , onSubmit}) => {
   const user = JSON.parse(localStorage.getItem('user'))
+
   const {
     register,
     control,
@@ -23,46 +17,38 @@ const StudentForm = ({ open, setOpen, onSubmit, schoolData, isEditMode, initialV
     defaultValues: isEditMode ? initialValues : {},
   });
   useEffect(() => {
-    setValue('name', initialValues?.name || '');
-    setValue('school', initialValues?.school || ''); 
-    setValue('rfidCardId', initialValues?.rfidCardId || '');
-    setValue('balance', initialValues?.balance || '');
+    if (initialValues?._id) {
+      setValue('name', initialValues?.name || '');
+      setValue('school', initialValues?.school || ''); 
+      setValue('cardID', initialValues?.cardID || '');
+      setValue('balance', initialValues?.balance || '');
+    }else{
+      setValue('name', '');
+      setValue('school', ''); 
+      setValue('cardID', '');
+      setValue('balance', 0);
+    }
+   
   }, [initialValues, setValue]);
 
   React.useEffect(() => {
     if (!open) {
       reset({
         name: '',
-        rfidCardId: '',
+        cardID: '',
         balance: '',
       });
     }
   }, [open, reset]);
-  const handleFormSubmit = async (data) => {
-    if (initialValues?._id) {
-      const updatedStudent ={ ...data, _id :initialValues?._id ,balance:0};
-      const response = await updateStudent(updatedStudent._id, updatedStudent)
-      enqueueSnackbar({message:"Student Updates", variant:'success'})
-    } else {
-      delete data._id
-      try{
-        const updatedStudent = {...data , school : user.school, balance:0}
-        const response = await createStudent(updatedStudent)
-        enqueueSnackbar({message:"Student Created", variant:'success'})
-        AllStudents()
-      }catch(error){
-        enqueueSnackbar({message:error.message, variant:'error'})
-      }
-    }
-    setOpen(false)
-  };
+  
+  
   return (
     <>
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>{initialValues?._id ? "Edit Student" : "Add Student"}</DialogTitle>
         <DialogContent>
           <form
-            onSubmit={handleSubmit(handleFormSubmit)}
+            onSubmit={handleSubmit(onSubmit)}
             style={{
               width: "100%",
               display: "flex",
@@ -71,6 +57,7 @@ const StudentForm = ({ open, setOpen, onSubmit, schoolData, isEditMode, initialV
               alignItems: "center",
             }}
           >
+            <Box >
             <TextField
               {...register("name", { required: true })}
               error={errors.name ? true : false}
@@ -79,14 +66,11 @@ const StudentForm = ({ open, setOpen, onSubmit, schoolData, isEditMode, initialV
               sx={{ mb: 2 }}
               defaultValue={initialValues?.name} 
             />
+            </Box>
            
             <TextField
-              {...register("rfidCardId", {
-                required: true,
-              })}
-              error={errors.rfidCardId ? true : false}
-              helperText={errors.rfidCardId ? "RFID Card ID is required " : ""}
-              label="RFID Card ID"
+              {...register("cardID")}
+              label="Card ID"
               sx={{ mb: 2 }}
             />
             <TextField
@@ -97,7 +81,9 @@ const StudentForm = ({ open, setOpen, onSubmit, schoolData, isEditMode, initialV
               })}
               label="Balance"
               sx={{ mb: 2 }}
+              defaultValue={initialValues?.balance || 0} 
             />
+            
             <Button type="submit" variant="contained" sx={{ width: "100%" }}>
               {initialValues?._id  ? "Update" : "Submit"}
             </Button>

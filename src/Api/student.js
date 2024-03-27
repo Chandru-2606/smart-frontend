@@ -28,7 +28,6 @@ const updateStudent = async(id, payload)=>{
 }
 
 const createStudent = async(payload)=>{
-    console.log(payload);
     try{
     const response = await apiClient().post(`/student`, payload)
     return response

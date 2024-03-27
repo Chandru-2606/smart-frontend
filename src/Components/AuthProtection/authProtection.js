@@ -1,7 +1,7 @@
 // Protected.js
 import React , {useEffect}from 'react';
 import { useLocation, Navigate, Outlet } from 'react-router-dom';
-import { tokenValidation } from '../../Api/auth';
+import { usersData } from '../../Api/auth';
 import { enqueueSnackbar } from 'notistack';
 function Protected() {
   const location = useLocation();
@@ -10,7 +10,7 @@ function Protected() {
 
    const tokenVerify =async()=>{
     try{
-    const response = await tokenValidation()
+    const response = await usersData()
     }catch(error){
       localStorage.clear()
       enqueueSnackbar({message:'Auth Failed. re-login'})

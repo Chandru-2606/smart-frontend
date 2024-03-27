@@ -5,7 +5,7 @@ const VerifyLogin = async(payload)=>{
         const res = await apiClient().post('/auth/login', payload)
         return res
       } catch (error) {
-        return error
+        throw error
       }
 }
 
@@ -18,7 +18,7 @@ const getContacts =async()=>{
     }
 }
 
-const tokenValidation =async(payload)=>{
+const usersData =async()=>{
     try{
     const response = await apiClient().get('auth/verify-auth')
     return response
@@ -29,4 +29,4 @@ const tokenValidation =async(payload)=>{
 
 
 
-export {VerifyLogin, getContacts, tokenValidation}
+export {VerifyLogin, getContacts, usersData}

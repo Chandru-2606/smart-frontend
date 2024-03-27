@@ -1,35 +1,52 @@
-import React, { useEffect } from "react";
-import {
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Box,
-} from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Button, Dialog, DialogTitle, DialogContent, TextField, FormControl, InputLabel, Select, MenuItem, Box} from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
+import { getSchools } from "../../Api/schools";
+import { SnackbarProvider, useSnackbar } from "notistack";
+import {IconButton} from "@mui/material";
+import Close from '@mui/icons-material/Close';
 
-function UserDialog({
-  dialogOpen,
-  handleCloseDialog,
-  selectedUser,
-  isCreateMode,
-  handleDialogSubmit,
-  schoolData,
-}) {
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm();
-
+function UserDialog({open, setOpen, selectedUser, isCreateMode, onSubmit}) {
+  const [schools, setSchools] = useState([]);
+  const [display, setDisplay] = useState(false)
+  const { control, handleSubmit, getValues, setValue,reset,  watch, formState: { errors }} = useForm({
+    defaultValues: selectedUser
+  });
   const role = watch("role");
+  const {enqueueSnackbar,closeSnackbar} = useSnackbar();
+
+  const fetchSchools = async()=>{
+    try {
+      const response = await getSchools()
+      setSchools(response.data)
+    } catch (error) {
+      enqueueSnackbar({message : error.response.data.message,variant : 'error',action: key => (
+        <IconButton size="small" aria-label="close" color="inherit" onClick={() => closeSnackbar(key)}>
+            <Close fontSize="small" />
+        </IconButton>
+    ),})
+  }
+  }
+  useEffect(() => {
+    if (selectedUser) {
+      setValue("username", selectedUser.username || "");
+      setValue("password", selectedUser.password || "");
+      setValue("role", selectedUser.role || "");
+      setValue("school", selectedUser.school || "");
+    }
+  }, [selectedUser, setValue]);
+
+  useEffect(()=>{
+    if(getValues('role') === 'schooladmin' || selectedUser?.role === 'schooladmin'){
+      setDisplay(true);
+    }else{
+      setDisplay(false);
+    }
+  },[role, selectedUser])
+
+  useEffect(()=>{
+    fetchSchools()
+  }, [])
 
   useEffect(() => {
     if (role === "schooladmin") {
@@ -40,11 +57,19 @@ function UserDialog({
   }, [role, setValue, selectedUser]);
 
   return (
-    <Box>
-      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+    <SnackbarProvider maxSnack={3} autoHideDuration={3000}>
+      <Dialog open={open} onClose={()=> {
+        setOpen(false)
+        reset({
+          school : '',
+          username : '',
+          password : '',
+          role : ''
+        })
+        }}>
         <DialogTitle>{isCreateMode ? "Create User" : "Edit User"}</DialogTitle>
         <DialogContent>
-          <form onSubmit={handleSubmit(handleDialogSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <Controller
               name="username"
               control={control}
@@ -56,6 +81,7 @@ function UserDialog({
                   label="Username"
                   fullWidth
                   margin="normal"
+
                   error={!!errors.username}
                   helperText={errors.username?.message}
                 />
@@ -99,7 +125,7 @@ function UserDialog({
                 </FormControl>
               )}
             />
-            {role === "schooladmin" && (
+            {display && (
               <Controller
                 name="school"
                 control={control}
@@ -114,8 +140,8 @@ function UserDialog({
                       inputProps={{ name: "school", id: "school" }}
                       error={!!errors.school}
                     >
-                      {schoolData &&
-                        schoolData.map((school) => (
+                      {schools &&
+                        schools.map((school) => (
                           <MenuItem key={school._id} value={school._id}>
                             {school.name}
                           </MenuItem>
@@ -131,7 +157,7 @@ function UserDialog({
           </form>
         </DialogContent>
       </Dialog>
-    </Box>
+     </SnackbarProvider>
   );
 }
 
