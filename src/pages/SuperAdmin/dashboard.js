@@ -11,15 +11,24 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Person3Icon from '@mui/icons-material/Person3';
 import ContactlessIcon from '@mui/icons-material/Contactless';
 import CallIcon from '@mui/icons-material/Call';
+import Loader from '../../Components/Loader/loader';
+import { useNavigate } from 'react-router-dom';
 function Dashboard() {
   const [stats, setStats] = useState({})
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
  
  const fetchAllStats = async()=>{
+  setLoading(true);
   try {
     const response = await getAllStats()
     setStats(response.data)
   } catch (error) {
     enqueueSnackbar({message: error.response.data.message, variant:'error'})
+  } finally {
+    setTimeout(()=>{
+      setLoading(false);
+    }, 250)
   }
  }
 
@@ -33,7 +42,7 @@ function Dashboard() {
       <Box sx={{ p: 3 }}>
       <Grid container spacing={2}>
       <Grid item xs={12} sm={6} md={6} lg={3}>
-          <CardActionArea>
+          <CardActionArea onClick={()=> navigate('/superadmin/schools')}>
             <Card sx={{ minWidth: 255, boxShadow: 3, height: "150px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderLeft: '5px solid #3f51b5', position: 'relative' }}>
               <CardContent>
                 <Typography variant="h5" component="div" sx={{ position: 'absolute', top: 0, left: 0, pl:2, pt:2 }}>Schools</Typography>
@@ -47,7 +56,7 @@ function Dashboard() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={6} lg={3}>
-          <CardActionArea>
+          <CardActionArea onClick={()=> navigate('/superadmin/users')}>
             <Card sx={{ minWidth: 255, boxShadow: 3, height: "150px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderLeft: '5px solid #3f51b5', position: 'relative' }}>
               <CardContent>
                 <Typography variant="h5" component="div" sx={{ position: 'absolute', top: 0, left: 0, pl:2, pt:2 }}>Users</Typography>
@@ -61,7 +70,7 @@ function Dashboard() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={6} lg={3}>
-          <CardActionArea>
+          <CardActionArea onClick={()=> navigate('/superadmin/schools')}>
             <Card sx={{ minWidth: 255, boxShadow: 3, height: "150px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderLeft: '5px solid #3f51b5', position: 'relative' }}>
               <CardContent>
                 <Typography variant="h5" component="div" sx={{ position: 'absolute', top: 0, left: 0, pl:2, pt:2 }}>Students</Typography>
@@ -75,7 +84,7 @@ function Dashboard() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={6} lg={3}>
-          <CardActionArea>
+          <CardActionArea onClick={()=> navigate('/superadmin/devices')}>
             <Card sx={{ minWidth: 255, boxShadow: 3, height: "150px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderLeft: '5px solid #3f51b5', position: 'relative' }}>
               <CardContent>
                 <Typography variant="h5" component="div" sx={{ position: 'absolute', top: 0, left: 0, pl:2, pt:2 }}>Devices</Typography>
@@ -91,7 +100,7 @@ function Dashboard() {
        {stats?.stats?.map((item, index)=>{
         return(
         <Grid item xs={12} sm={6} md={6} lg={3}>
-          <CardActionArea>
+          <CardActionArea onClick={()=> navigate('/superadmin/transactions')}>
             <Card sx={{ minWidth: 255, boxShadow: 3, height: "150px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderLeft: '5px solid #3f51b5', position: 'relative' }}>
               <CardContent>
                 <Typography variant="h5" component="div" sx={{ position: 'absolute', top: 0, left: 0, pl:2, pt:2 }}>{item._id === 'call' ? 'Call' : 'Recharge'}</Typography>
@@ -108,6 +117,7 @@ function Dashboard() {
 
       </Grid>
     </Box>
+    <Loader loading={loading} />
     </Box >
   )
 }

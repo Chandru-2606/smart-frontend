@@ -71,7 +71,7 @@ function LoginForm() {
             alignItems: "center",
             justifyContent: "center",
             transition: "opacity 0.5s",
-            p:3
+            p:1
           }}
           onSubmit={handleSubmit(onSubmit)}
         >
@@ -108,7 +108,7 @@ function LoginForm() {
         </Box>
 
         <div style={{ fontSize: '12px', fontFamily: 'Poppins, sans-serif' , marginTop:'30px'}}>
-          &copy; {new Date().getFullYear()} Name of the School. All rights reserved.
+          &copy; {new Date().getFullYear()} Apyvibe Technologies. All rights reserved.
         </div>
         <Loader loading={loading} />
         </Box>

@@ -158,12 +158,15 @@ const UserList = () => {
               <DataGrid
                 rows={rows}
                 columns={columns}
-                pageSize={5}
                 autoHeight
-                rowsPerPageOptions={[5, 10, 20]}
-                disableSelectionOnClick
+            initialState={{
+                pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                },
+            }}
+            sx={{fontFamily: 'Poppins, sans-serif',backgroundColor: grey[50],boxShadow:4, minWidth: 900, m:1}}
+            pageSizeOptions={[5, 10, 15]}
                 getRowId={(row) => row._id}
-                sx={{ boxShadow: 4, backgroundColor: grey[50], fontFamily: 'Poppins, sans-serif', borderRadius: 2, minHeight: '3vh', minWidth: 700 }}
               />
             </Box>
             <UserDialog

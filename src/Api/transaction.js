@@ -10,6 +10,24 @@ const getTransaction = async()=>{
     }
 }
 
+const getTransactionByStudent = async(id)=>{
+    try {
+        const response = await apiClient().get(`/endCall/${id}`)
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}
+
+const deleteTransaction = async(id)=>{
+    try {
+        const response = await apiClient().delete(`/endCall/${id}`)
+        return response
+    } catch (error) {
+        throw error
+    }
+}
+
 const createTransactions = async(payload)=>{
     try {
         const response = await apiClient().post('/endCall', payload)
@@ -37,4 +55,4 @@ const getAllStats = async()=>{
     }
 }
 
-export {getTransaction, createTransactions , getStats, getAllStats}
+export {getTransaction, createTransactions , getStats, getAllStats, deleteTransaction, getTransactionByStudent}

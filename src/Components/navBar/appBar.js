@@ -60,7 +60,7 @@ function Appbar({ handleToggle }) {
             <MenuIcon />
           </IconButton>
           <Box sx={{display:"flex", justifyContent:"center", alignItems:"center", gap:2}}>
-            <Typography variant="h6" sx={{color:"black",}}>Organisation Name</Typography>
+            <Typography variant="h6" sx={{color:"black",}}>Apyvibe Technologies</Typography>
           </Box>
 
           <React.Fragment>
@@ -80,7 +80,7 @@ function Appbar({ handleToggle }) {
                   aria-haspopup="true"
                   aria-expanded={open ? "true" : undefined}
                 >
-                  <Avatar sx={{ bgcolor: deepOrange[500] }}>M</Avatar>
+                  <Avatar sx={{ bgcolor: deepOrange[500] }}>S</Avatar>
                 </IconButton>
               </Tooltip>
             </Box>

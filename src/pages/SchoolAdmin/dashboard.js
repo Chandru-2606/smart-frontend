@@ -11,16 +11,25 @@ import { getStudentBySchool } from '../../Api/schools';
 import { enqueueSnackbar } from 'notistack';
 import { getStats } from '../../Api/transaction';
 import { getDevices } from '../../Api/devices';
+import { useNavigate } from 'react-router-dom';
+import Loader from '../../Components/Loader/loader';
 function Dashboard() {
   const [stats, setStats] = useState([])
+  const [loading , setLoading] = useState(false);
+  const navigate = useNavigate()
   const  user = JSON.parse(localStorage.getItem('user'))
 
   const fetchStats = async()=>{
+    setLoading(true);
     try {
       const response = await getStats(user.school)
       setStats(response.data)
     } catch (error) {
       enqueueSnackbar({message: error.response.data.message, variant:'error'})
+    } finally{
+      setTimeout(()=>{
+        setLoading(false)
+      }, 250)
     }
   }
 
@@ -34,7 +43,7 @@ function Dashboard() {
     <Box sx={{ p: 3 }}>
       <Grid container spacing={2}>
       <Grid item xs={12} sm={6} md={6} lg={3}>
-          <CardActionArea>
+          <CardActionArea onClick={()=> navigate('/schooladmin/students')}>
             <Card sx={{ minWidth: 255, boxShadow: 3, height: "150px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderLeft: '5px solid #3f51b5', position: 'relative' }}>
               <CardContent>
                 <Typography variant="h5" component="div" sx={{ position: 'absolute', top: 0, left: 0, pl:2, pt:2 }}>Students</Typography>
@@ -48,7 +57,7 @@ function Dashboard() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={6} lg={3}>
-          <CardActionArea>
+          <CardActionArea onClick={()=> navigate('/schooladmin/transactions')}>
             <Card sx={{ minWidth: 255, boxShadow: 3, height: "150px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderLeft: '5px solid #3f51b5', position: 'relative' }}>
               <CardContent>
                 <Typography variant="h5" component="div" sx={{ position: 'absolute', top: 0, left: 0, pl:2, pt:2 }}>Recharge Today</Typography>
@@ -61,7 +70,7 @@ function Dashboard() {
           </CardActionArea>
         </Grid>
         <Grid item xs={12} sm={6} md={6} lg={3}>
-          <CardActionArea>
+          <CardActionArea onClick={()=> navigate('/schooladmin/transactions')}>
             <Card sx={{ minWidth: 255, boxShadow: 3, height: "150px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderLeft: '5px solid #3f51b5', position: 'relative' }}>
               <CardContent>
                 <Typography variant="h5" component="div" sx={{ position: 'absolute', top: 0, left: 0, pl:2, pt:2 }}>Call's Today</Typography>
@@ -75,6 +84,7 @@ function Dashboard() {
         </Grid>
       </Grid>
     </Box>
+    <Loader loading={loading} />
     </Box>
   );
 }

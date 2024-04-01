@@ -125,7 +125,7 @@ function DeviceList() {
     <Box
     sx={{width: { md: 'calc(100% - 240px)', sm: 'calc(100% - 240px)', xs: '100%',   lg: 'calc(100% - 240px)', },
       minHeight: '90vh', ml: { md: '240px',sm: '240px',xs: '0px',lg: '240px',},backgroundColor: "#f7f7f8",p: 3}}>
-       <Box sx={{display:'flex', justifyContent:'space-between', mb:1}}>
+       <Box sx={{display:'flex', justifyContent:'space-between', mb:1, m:1}}>
             <Typography variant="h6" sx={{fontWeight:'bolder',fontFamily: 'Poppins, sans-serif' }} >Devices List</Typography>
             <Button variant='contained' onClick={() => {
               setLoading(true)
@@ -140,11 +140,16 @@ function DeviceList() {
             rows={rows}
             columns={columns}
             autoHeight
-            pageSize={5}
+            initialState={{
+                pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                },
+            }}
+            sx={{fontFamily: 'Poppins, sans-serif',backgroundColor: grey[50],boxShadow:4, minWidth: 900, m:1}}
+            pageSizeOptions={[5, 10, 15]}
             rowsPerPageOptions={[5, 10, 20]}
             disableSelectionOnClick
             getRowId={(row) => row._id}
-            sx={{ boxShadow: 4, backgroundColor: grey[50], fontFamily: 'Poppins, sans-serif', borderRadius: 2, minHeight: '3vh', minWidth: 700 }}
             />
         </Box>
       <DevicesDialog schools={schools} open={open} setOpen={setOpen} 
