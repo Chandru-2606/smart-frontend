@@ -147,8 +147,8 @@ const CreateStudents = () => {
     <Box
         sx={{width: { md: 'calc(100% - 240px)', sm: 'calc(100% - 240px)', xs: '100%',   lg: 'calc(100% - 240px)', },
           minHeight: '90vh', ml: { md: '240px',sm: '240px',xs: '0px',lg: '240px',},backgroundColor: "#f7f7f8",p: 3}}>
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb:3, width:'100%' }}>
-          <Box  sx={{gap:2}} >
+      <Box sx={{ display: "flex", justifyContent: {lg :"flex-end", md:'flex-end'}, mb:3, width:'100%' }}>
+          <Box  sx={{gap:2, display:'flex'}} >
           <input  type="file" ref={uploadInputRef} onChange={handleFileUpload} accept=".xls, .xlsx" style={{ display: "none" }} />
       <Button onClick={handleUploadClick} variant="contained" color="primary" startIcon={<FileUploadOutlined />}>
         Upload Excel

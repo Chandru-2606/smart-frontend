@@ -65,7 +65,7 @@ function Transactions() {
           
               return (
                 <div style={cellStyle}>
-                  {transactionType === 'recharge' ? ` ₹ ${amount} Cr` : `₹ ${amount} Dr` }
+                  {transactionType === 'recharge' ? ` ₹ ${amount?.toFixed(2)} Cr` : `₹ ${amount?.toFixed(2)} Dr` }
                 </div>
               );
             }

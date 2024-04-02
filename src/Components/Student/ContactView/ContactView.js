@@ -134,8 +134,8 @@ function ContactView({setVisible, selectedRow, fetchStudents}) {
     }
   return (
     <Box>
-      <Box sx={{display:'flex', justifyContent:'space-between', mb:1}}>
-           <Box sx={{display: {lg:'flex' , md:'flex'}, justifyContent:'center', alignContent:'center' , alignItems:'center', m:1}}>
+      <Box sx={{display: {lg: 'flex'}, justifyContent:{lg:'space-between'}, mb:1, m:1}}>
+           <Box sx={{display: 'flex'}}>
                <ArrowBackIosNewIcon style={{cursor:'pointer', marginRight:'10px'}} onClick={()=>{ setVisible(false)}} />
                <Typography variant="h6" sx={{fontWeight:'bolder',fontFamily: 'Poppins, sans-serif' }} >Contact of {selectedRow?.name} </Typography>
            </Box>

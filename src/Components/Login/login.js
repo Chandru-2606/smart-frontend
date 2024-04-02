@@ -77,7 +77,7 @@ function LoginForm() {
         >
           <img src={logo} alt='logo' style={{width:'20%', height:'20%'}} />
           <Typography variant="h5" component="h2" sx={{ p: 1, fontFamily: 'Poppins, sans-serif' }}>
-            Name of the School
+          Apyvibe Technologies
           </Typography>
           <Typography variant="h5" component="h2" sx={{ p: 1, fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
             Welcome Back
