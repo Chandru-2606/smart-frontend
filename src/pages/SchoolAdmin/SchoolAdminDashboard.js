@@ -8,15 +8,18 @@ import Transactions from './Transactions/TransactionsList';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import CreditScoreIcon from '@mui/icons-material/CreditScore';
 import CreateStudents from './CreateStudents/CreateStudents';
-import Recharge from './Recharge/Recharge'
+import Recharge from './Recharge/Recharge';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+
 
 function SchoolAdminDashboard() {
   const SchoolAdminRoute = [
     { name: "Dashboard", link: "/", icon: <DashboardOutlined />, component: <Dashboard /> },
-    { name: "Create Students", link: "createStudents", icon: <CreditScoreIcon />, component: <CreateStudents /> },
+    { name: "Create Students", link: "createStudents", icon: <PersonAddAltIcon />, component: <CreateStudents /> },
     { name: "Students", link: "students", icon: <PersonOutlineIcon />, component: < StudentList/> },
     { name: "Recharge", link: "recharge", icon: <CreditScoreIcon />, component: <Recharge /> },
-    { name: "Transactions", link: "transactions", icon: <CreditScoreIcon />, component: <Transactions /> },
+    { name: "Transactions", link: "transactions", icon: <ReceiptLongIcon />, component: <Transactions /> },
   ];
 
   return (

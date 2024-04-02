@@ -48,7 +48,7 @@ function StudentList({selectedSchooldata, setSchoolVisible}) {
     { field: "name", headerName: "Name", flex: 1 },
     { 
       field: "cardID", 
-      headerName: "RFID Card", 
+      headerName: "CardID", 
       flex: 1, 
       renderCell: (params) => params.row.cardID ? params.row.cardID : "Not Added", 
     },
@@ -145,8 +145,8 @@ function StudentList({selectedSchooldata, setSchoolVisible}) {
          minHeight: '90vh', ml: { md: '240px',sm: '240px',xs: '0px',lg: '240px',},backgroundColor: "#f7f7f8",p: 3}}>
         <>
         {!visible && 
-         <Box sx={{display:{lg: 'flex', md:'flex'}, justifyContent:'space-between', mb:1, m:1}}>
-            <Box sx={{display: 'flex', justifyContent:'center', alignContent:'center' , alignItems:'center'}}>
+         <Box sx={{display:{lg: 'flex', md:'flex', sm:'flex'}, justifyContent:'space-between', mb:1, m:1}}>
+            <Box sx={{display: 'flex', alignItems:'center'}}>
              {selectedSchooldata?._id &&
               <ArrowBackIosNewIcon style={{cursor:'pointer', marginRight:'10px'}} onClick={()=>{ setSchoolVisible(false)}} />
             }
