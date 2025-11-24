@@ -9,6 +9,7 @@ import UserDialog from "../../../Components/Users/CreateUserDialog";
 import Loader from "../../../Components/Loader/loader";
 import { SnackbarProvider, enqueueSnackbar } from "notistack";
 import { grey } from "@mui/material/colors";
+import ConfirmationDialog from "../../../Components/ConfirmationDialog/ConfirmationDialog";
 
 
 const UserList = () => {
@@ -17,6 +18,8 @@ const UserList = () => {
   const [isCreateMode, setCreateMode] = useState(false);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -37,19 +40,23 @@ const UserList = () => {
     fetchUsers();
   }, []);
 
-  const handleDelete = async (userId) => {
+  const handleDelete = async () => {
+    if (!userToDelete) return;
+    
     setLoading(true);
+    setDeleteDialogOpen(false);
     try {
-      const response = await deleteUsers(userId);
+      const response = await deleteUsers(userToDelete._id);
       if (response.status === 204) {
         enqueueSnackbar({message:'User Deleted', variant:'success'})
       }
     } catch (error) {
-      enqueueSnackbar({ message: error.response.data.message, variant: 'error' });
+      enqueueSnackbar({ message: error.response?.data?.message || 'Failed to delete user', variant: 'error' });
     }finally{
       setTimeout(()=>{
         setLoading(false);
         fetchUsers();
+        setUserToDelete(null);
       }, 250)
     }
   };
@@ -119,7 +126,10 @@ const UserList = () => {
             <EditIcon />
           </IconButton>
           <IconButton
-            onClick={() => handleDelete(params.row?._id)}
+            onClick={() => {
+              setUserToDelete(params.row);
+              setDeleteDialogOpen(true);
+            }}
             color="error"
           >
             <DeleteIcon />
@@ -176,6 +186,19 @@ const UserList = () => {
                 isCreateMode={isCreateMode}
                 onSubmit={onSubmit}
               />
+            <ConfirmationDialog
+              open={deleteDialogOpen}
+              onClose={() => {
+                setDeleteDialogOpen(false);
+                setUserToDelete(null);
+              }}
+              onConfirm={handleDelete}
+              title="Confirm Delete User"
+              message={`Are you sure you want to delete user "${userToDelete?.username}"? This action cannot be undone.`}
+              confirmText="Delete"
+              cancelText="Cancel"
+              type="delete"
+            />
           <Loader loading={loading} />
         </Box>
       </SnackbarProvider>

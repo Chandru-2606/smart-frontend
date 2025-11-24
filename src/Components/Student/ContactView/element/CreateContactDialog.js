@@ -53,8 +53,8 @@ const ContactForm = ({ open, setOpen, onSubmit, selectedContact ={} }) => {
             {...register("phoneNumber", {
               required: "Phone Number is required",
               pattern: {
-                value: /^\d{10}$/,
-                message: "Invalid Phone Number",
+                value: /^\d{5}$|^\d{10}$|^\d{11}$/,
+                message: "Phone number must be 5, 10, or 11 digits",
               },
             })}
           />

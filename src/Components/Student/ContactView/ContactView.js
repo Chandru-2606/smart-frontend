@@ -10,8 +10,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Loader from '../../Loader/loader';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import RechargeDialog from '../Recharge/RechargeDialog';
-import { createTransactions } from '../../../Api/transaction';
-import { updateStudent } from '../../../Api/student';
+import { createRecharge } from '../../../Api/recharge';
 import { enqueueSnackbar } from 'notistack';
 
 function ContactView({setVisible, selectedRow, fetchStudents}) {
@@ -112,26 +111,21 @@ function ContactView({setVisible, selectedRow, fetchStudents}) {
         }
     }
 
-    const onRechargeSubmit =async(data)=>{
-        let updatedStudent = {
-            ...selectedRow,
-            balance : Number(selectedRow.balance) + Number(data.amount)
-        }
-        let transactions = {
-            transactionType : 'recharge',
-            amount : data.amount,
-            student : selectedRow._id
-        }
+    const onRechargeSubmit = async (data) => {
+        const rechargeData = {
+            ...data,
+            student: selectedRow._id
+        };
         try {
-            const response = await updateStudent(selectedRow._id, updatedStudent)
-            const transactionResponse = await createTransactions(transactions)
+            await createRecharge(rechargeData);
+            enqueueSnackbar({ message: 'Recharged Successfully', variant: 'success' });
         } catch (error) {
-            enqueueSnackbar({message:error.response.data.message, variant:'success'})
-        } finally{
-            fetchStudents()
-            setVisible(false)
+            enqueueSnackbar({ message: error.response.data.message, variant: 'error' });
+        } finally {
+            fetchStudents();
+            setVisible(false);
         }
-    }
+    };
   return (
     <Box>
       <Box sx={{display: {lg: 'flex'}, justifyContent:{lg:'space-between'}, mb:1, m:1}}>

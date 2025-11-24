@@ -14,6 +14,9 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import Config from './Config/Config';
 import Transactions from './Transactions/Transactions';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import Reports from './Reports';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+
 function SuperAdminDashboard() {
   const SuperAdminRoute = [
     { name: "Dashboard", link: "/", icon: <DashboardOutlined />, component: <Dashboard /> },
@@ -22,6 +25,7 @@ function SuperAdminDashboard() {
     { name: "Devices", link: "devices", icon: <TabletAndroidIcon />, component: <DeviceList /> },
     { name: "Config", link: "config", icon: <AccountBalanceWalletIcon />, component: <Config /> },
     { name: "Transactions", link: "transactions", icon: <ReceiptLongIcon />, component: <Transactions /> },
+    { name: "Reports", link: "reports", icon: <AssessmentIcon />, component: <Reports /> },
   ];
 
   return (

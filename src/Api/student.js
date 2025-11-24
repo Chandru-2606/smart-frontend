@@ -53,4 +53,32 @@ const getContactByStudent =async(id)=>{
         throw error
     }
 }
-export {getStudents, getStudentByID, updateStudent, createStudent, deleteStudent, getContactByStudent}
+
+const updateCardValidity = async (id, isValid) => {
+    try {
+        const response = await apiClient().put(`/student/update-validity/${id}`, { isValid });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const validateCall = async (studentId) => {
+    try {
+        const response = await apiClient().post(`/student/validate-call`, { studentId });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}
+
+const bulkCreateStudents = async (students) => {
+    try {
+        const response = await apiClient().post(`/student/bulk`, { students });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export {getStudents, getStudentByID, updateStudent, createStudent, deleteStudent, getContactByStudent, updateCardValidity, validateCall, bulkCreateStudents}

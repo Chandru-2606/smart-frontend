@@ -10,7 +10,7 @@ const getRecharge = async()=>{
  }
 const createRecharge = async(payload)=>{
     try{
-        const response = await apiClient().get('/recharge', payload)
+        const response = await apiClient().post('/recharge', payload)
         return response
     }catch(error){
         throw error

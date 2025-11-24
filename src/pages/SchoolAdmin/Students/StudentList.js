@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { getStudentBySchool } from '../../../Api/schools';
-import { deleteStudent, updateStudent } from '../../../Api/student';
-import { SnackbarProvider, enqueueSnackbar  } from "notistack";
+import { deleteStudent, updateStudent, updateCardValidity } from '../../../Api/student';
+import { SnackbarProvider, enqueueSnackbar } from "notistack";
 import { grey } from "@mui/material/colors";
-import { Box, Typography, TextField, IconButton, Slide } from '@mui/material';
+import { Box, Typography, TextField, IconButton, Slide, Switch } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -12,6 +12,7 @@ import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import ContactView from '../../../Components/Student/ContactView/ContactView';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import StudentDetails from '../../../Components/Student/CreateStudentDialog/CreateStudentDialog';
+import ConfirmationDialog from '../../../Components/ConfirmationDialog/ConfirmationDialog';
 
 
 function StudentList({selectedSchooldata, setSchoolVisible}) {
@@ -23,6 +24,8 @@ function StudentList({selectedSchooldata, setSchoolVisible}) {
   const [selectedRow, setSelectedRow] = useState('')
   const containerRef = useRef(null);
   const [open, setOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [studentToDelete, setStudentToDelete] = useState(null);
 
   
 
@@ -44,6 +47,17 @@ function StudentList({selectedSchooldata, setSchoolVisible}) {
     setSelectedRow(data)
     setVisible(true)
   }
+
+  const handleCardValidityChange = async (id, newIsValid) => {
+    try {
+      await updateCardValidity(id, newIsValid);
+      enqueueSnackbar({ message: 'Card validity updated', variant: 'success' });
+      fetchStudents(); // Refresh the list
+    } catch (error) {
+      enqueueSnackbar({ message: error.response.data.message, variant: 'error' });
+    }
+  };
+
   const columns = [
     { field: "name", headerName: "Name", flex: 1 },
     { 
@@ -53,6 +67,29 @@ function StudentList({selectedSchooldata, setSchoolVisible}) {
       renderCell: (params) => params.row.cardID ? params.row.cardID : "Not Added", 
     },
     { field: "balance", headerName: "Balance", flex: 1 },
+    {
+      field: "isCardValid",
+      headerName: "Card Valid",
+      flex: 1,
+      renderCell: (params) => (
+        <Switch
+          checked={params.row.isCardValid}
+          onChange={(e) => handleCardValidityChange(params.row._id, e.target.checked)}
+        />
+      ),
+    },
+    {
+      field: "activePack",
+      headerName: "Active Pack",
+      flex: 1,
+      renderCell: (params) => params.row.activePack || "None",
+    },
+    {
+      field: "packValidity",
+      headerName: "Pack Validity",
+      flex: 1,
+      renderCell: (params) => params.row.packValidity ? new Date(params.row.packValidity).toLocaleDateString() : "N/A",
+    },
     { 
       field: "actions", 
       headerName: "Actions", 
@@ -77,7 +114,10 @@ function StudentList({selectedSchooldata, setSchoolVisible}) {
             <IconButton>
           <DeleteIcon
             style={{ cursor: "pointer", color: "red"}}
-            onClick={() => handleDelete(params.row._id)}
+            onClick={() => {
+              setStudentToDelete(params.row);
+              setDeleteDialogOpen(true);
+            }}
           />
           </IconButton>
           <IconButton>
@@ -92,21 +132,24 @@ function StudentList({selectedSchooldata, setSchoolVisible}) {
     },
   ];
 
-  const handleDelete = async (id) => {
-    setLoading(true)
+  const handleDelete = async () => {
+    if (!studentToDelete) return;
+    
+    setLoading(true);
+    setDeleteDialogOpen(false);
     try {
-      const studentResponse = await deleteStudent(id);
+      const studentResponse = await deleteStudent(studentToDelete._id);
       if (studentResponse.status === 204) {
         enqueueSnackbar({ message: 'Student Deleted', variant: 'success' });
       }
-      
     } catch (error) {
-      enqueueSnackbar({ message: error.response.data.message, variant: 'error' });
-    }finally{
-      setTimeout(()=>{
+      enqueueSnackbar({ message: error.response?.data?.message || 'Failed to delete student', variant: 'error' });
+    } finally {
+      setTimeout(() => {
         setLoading(false);
         fetchStudents();
-      },250)
+        setStudentToDelete(null);
+      }, 250);
     }
   };
 
@@ -187,6 +230,19 @@ function StudentList({selectedSchooldata, setSchoolVisible}) {
               </Slide>
        </>
        <StudentDetails open={open} setOpen={setOpen} onSubmit={onSubmit} initialValues={selectedRow} />
+       <ConfirmationDialog
+         open={deleteDialogOpen}
+         onClose={() => {
+          setDeleteDialogOpen(false);
+          setStudentToDelete(null);
+         }}
+         onConfirm={handleDelete}
+         title="Confirm Delete Student"
+         message={`Are you sure you want to delete student "${studentToDelete?.name}"? This action cannot be undone.`}
+         confirmText="Delete"
+         cancelText="Cancel"
+         type="delete"
+       />
        <Loader loading={loading} />
        </Box>
        </SnackbarProvider>

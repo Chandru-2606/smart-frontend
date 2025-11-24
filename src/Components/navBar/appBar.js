@@ -5,25 +5,15 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { ArrowDropDownCircleOutlined } from "@mui/icons-material";
+import { Avatar, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import { deepOrange } from "@mui/material/colors";
-import Avatar from "@mui/material/Avatar";
-import { Button } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
-import Menu from "@mui/material/Menu";
-import Divider from "@mui/material/Divider";
-import Tooltip from "@mui/material/Tooltip";
-import MenuItem from "@mui/material/MenuItem";
-import PersonAdd from "@mui/icons-material/PersonAdd";
-import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
 import Loader from "../Loader/loader";
+
 function Appbar({ handleToggle }) {
-  const drawWidth = 240;
-  const items = JSON.parse(localStorage.getItem('user'));
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [loading, setLoading] =  React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const open = Boolean(anchorEl);
 
   const handleClick = (event) => {
@@ -35,19 +25,20 @@ function Appbar({ handleToggle }) {
   const navigate = useNavigate()
   const handleLogout = () => {
     setLoading(true);
-    setTimeout(()=>{
+    setTimeout(() => {
       localStorage.clear()
       navigate('/')
       setLoading(false);
     }, 250)
   };
   return (
-    <div>
+    <>
       <AppBar
         position="static"
         sx={{
-          backgroundColor: "#fff",
-          padding:"0px"
+          backgroundColor: 'transparent',
+          boxShadow: 'none',
+          color: 'text.primary'
         }}
       >
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -55,14 +46,11 @@ function Appbar({ handleToggle }) {
             color="inherit"
             edge="start"
             onClick={handleToggle}
-            sx={{ mr: 2, display: { sm: "none" , color:"black"} }}
+            sx={{ mr: 2, display: { sm: "none" } }}
           >
             <MenuIcon />
           </IconButton>
-          <Box sx={{display:"flex", justifyContent:"center", alignItems:"center", gap:2}}>
-            <Typography variant="h6" sx={{color:"black",}}>Apyvibe Technologies</Typography>
-          </Box>
-
+          <Box />
           <React.Fragment>
             <Box
               sx={{
@@ -129,7 +117,8 @@ function Appbar({ handleToggle }) {
           </React.Fragment>
         </Toolbar>
       </AppBar>
-    </div>
+      <Loader loading={loading} />
+    </>
   );
 }
 

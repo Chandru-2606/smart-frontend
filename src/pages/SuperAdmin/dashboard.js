@@ -1,125 +1,74 @@
 import React, { useEffect, useState } from 'react';
-import Grid from "@mui/material/Grid";
-import Card from "@mui/material/Card";
-import CardActionArea from "@mui/material/CardActionArea";
-import CardContent from "@mui/material/CardContent";
-import { Box, Typography, IconButton } from '@mui/material';
-import SchoolIcon from '@mui/icons-material/School';
-import { enqueueSnackbar } from 'notistack';
-import { getAllStats } from '../../Api/transaction';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import Person3Icon from '@mui/icons-material/Person3';
-import ContactlessIcon from '@mui/icons-material/Contactless';
-import CallIcon from '@mui/icons-material/Call';
+import { Box, Typography, Grid, Card, CardContent, CardActionArea, IconButton } from '@mui/material';
+import { getSuperAdminSummary } from '../../Api/reports';
 import Loader from '../../Components/Loader/loader';
-import { useNavigate } from 'react-router-dom';
+import { enqueueSnackbar, SnackbarProvider } from 'notistack';
+import SchoolIcon from '@mui/icons-material/School';
+import PeopleIcon from '@mui/icons-material/People';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+
 function Dashboard() {
-  const [stats, setStats] = useState({})
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
- 
- const fetchAllStats = async()=>{
-  setLoading(true);
-  try {
-    const response = await getAllStats()
-    setStats(response.data)
-  } catch (error) {
-    enqueueSnackbar({message: error.response.data.message, variant:'error'})
-  } finally {
-    setTimeout(()=>{
-      setLoading(false);
-    }, 250)
-  }
- }
+    const [summary, setSummary] = useState(null);
+    const [loading, setLoading] = useState(false);
 
-  useEffect(()=>{
-     fetchAllStats()
-  },[])
-  
-  return (
-    <Box sx={{width: {md: 'calc(100% - 240px)',sm: 'calc(100% - 240px)',xs: '100%',lg: 'calc(100% - 240px)',},
-    height: 'auto', ml: {md: '240px',sm: '240px',xs: '0px',lg: '240px',},}} >
-      <Box sx={{ p: 3 }}>
-      <Grid container spacing={2}>
-      <Grid item xs={12} sm={6} md={6} lg={3}>
-          <CardActionArea onClick={()=> navigate('/superadmin/schools')}>
-            <Card sx={{ minWidth: 255, boxShadow: 3, height: "150px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderLeft: '5px solid #3f51b5', position: 'relative' }}>
-              <CardContent>
-                <Typography variant="h5" component="div" sx={{ position: 'absolute', top: 0, left: 0, pl:2, pt:2 }}>Schools</Typography>
-                <Typography variant="body2" sx={{ fontSize: 30, position: 'absolute', bottom: 0, left: 0, p:4 }}>{stats?.totalSchools}</Typography>
-              </CardContent>
-              <IconButton sx={{ position: 'absolute', bottom: 0, right: 0, m: 3, '& .MuiSvgIcon-root': { fontSize: 40 } }} aria-label="edit">
-                <SchoolIcon />
-              </IconButton>
-            </Card>
-          </CardActionArea>
-        </Grid>
+    useEffect(() => {
+        const fetchSummary = async () => {
+            setLoading(true);
+            try {
+                const response = await getSuperAdminSummary();
+                setSummary(response.data);
+            } catch (error) {
+                enqueueSnackbar({ message: 'Could not fetch summary data', variant: 'error' });
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchSummary();
+    }, []);
 
-        <Grid item xs={12} sm={6} md={6} lg={3}>
-          <CardActionArea onClick={()=> navigate('/superadmin/users')}>
-            <Card sx={{ minWidth: 255, boxShadow: 3, height: "150px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderLeft: '5px solid #3f51b5', position: 'relative' }}>
-              <CardContent>
-                <Typography variant="h5" component="div" sx={{ position: 'absolute', top: 0, left: 0, pl:2, pt:2 }}>Users</Typography>
-                <Typography variant="body2" sx={{ fontSize: 30, position: 'absolute', bottom: 0, left: 0, p:4 }}>{stats?.totalUsers}</Typography>
-              </CardContent>
-              <IconButton sx={{ position: 'absolute', bottom: 0, right: 0, m: 3, '& .MuiSvgIcon-root': { fontSize: 40 } }} aria-label="edit">
-                <AccountCircleIcon />
-              </IconButton>
-            </Card>
-          </CardActionArea>
-        </Grid>
+    const StatCard = ({ title, value, icon, color }) => (
+        <Card sx={{ display: 'flex', alignItems: 'center', p: 2, borderLeft: `5px solid ${color}` }}>
+            <CardActionArea>
+                <CardContent>
+                    <Box sx={{ flexGrow: 1 }}>
+                        <Typography variant="h6" color="textSecondary">{title}</Typography>
+                        <Typography variant="h4">{value}</Typography>
+                    </Box>
+                    <IconButton sx={{ color: color, backgroundColor: `${color}1a` }}>
+                        {icon}
+                    </IconButton>
+                </CardContent>
+            </CardActionArea>
+        </Card>
+    );
 
-        <Grid item xs={12} sm={6} md={6} lg={3}>
-          <CardActionArea onClick={()=> navigate('/superadmin/schools')}>
-            <Card sx={{ minWidth: 255, boxShadow: 3, height: "150px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderLeft: '5px solid #3f51b5', position: 'relative' }}>
-              <CardContent>
-                <Typography variant="h5" component="div" sx={{ position: 'absolute', top: 0, left: 0, pl:2, pt:2 }}>Students</Typography>
-                <Typography variant="body2" sx={{ fontSize: 30, position: 'absolute', bottom: 0, left: 0, p:4 }}>{stats?.totalStudents}</Typography>
-              </CardContent>
-              <IconButton sx={{ position: 'absolute', bottom: 0, right: 0, m: 3, '& .MuiSvgIcon-root': { fontSize: 40 } }} aria-label="edit">
-                <Person3Icon />
-              </IconButton>
-            </Card>
-          </CardActionArea>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={6} lg={3}>
-          <CardActionArea onClick={()=> navigate('/superadmin/devices')}>
-            <Card sx={{ minWidth: 255, boxShadow: 3, height: "150px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderLeft: '5px solid #3f51b5', position: 'relative' }}>
-              <CardContent>
-                <Typography variant="h5" component="div" sx={{ position: 'absolute', top: 0, left: 0, pl:2, pt:2 }}>Devices</Typography>
-                <Typography variant="body2" sx={{ fontSize: 30, position: 'absolute', bottom: 0, left: 0, p:4 }}>{stats?.deviceCount}</Typography>
-              </CardContent>
-              <IconButton sx={{ position: 'absolute', bottom: 0, right: 0, m: 3, '& .MuiSvgIcon-root': { fontSize: 40 } }} aria-label="edit">
-                <ContactlessIcon />
-              </IconButton>
-            </Card>
-          </CardActionArea>
-        </Grid>
-
-       {stats?.stats?.map((item, index)=>{
-        return(
-        <Grid item xs={12} sm={6} md={6} lg={3}>
-          <CardActionArea onClick={()=> navigate('/superadmin/transactions')}>
-            <Card sx={{ minWidth: 255, boxShadow: 3, height: "150px", display: "flex", flexDirection: "column", justifyContent: "space-between", borderLeft: '5px solid #3f51b5', position: 'relative' }}>
-              <CardContent>
-                <Typography variant="h5" component="div" sx={{ position: 'absolute', top: 0, left: 0, pl:2, pt:2 }}>{item._id === 'call' ? 'Call' : 'Recharge'}</Typography>
-                <Typography variant="body2" sx={{ fontSize: 30, position: 'absolute', bottom: 0, left: 0, p:4 }}>{item.count}</Typography>
-              </CardContent>
-              <IconButton sx={{ position: 'absolute', bottom: 0, right: 0, m: 3, '& .MuiSvgIcon-root': { fontSize: 40 } }} aria-label="edit">
-                <CallIcon />
-              </IconButton>
-            </Card>
-          </CardActionArea>
-        </Grid>
-         )
-        })}
-
-      </Grid>
-    </Box>
-    <Loader loading={loading} />
-    </Box >
-  )
+    return (
+        <SnackbarProvider maxSnack={3} autoHideDuration={3000}>
+            <Box sx={{
+                width: { md: 'calc(100% - 240px)', sm: 'calc(100% - 240px)', xs: '100%', lg: 'calc(100% - 240px)' },
+                minHeight: '90vh', ml: { md: '240px', sm: '240px', xs: '0px', lg: '240px' }, p: 3
+            }}>
+                <Typography variant="h4" gutterBottom>Super Admin Dashboard</Typography>
+                {loading ? <Loader loading={loading} /> : (
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} sm={6} md={3}>
+                            <StatCard title="Total Schools" value={summary?.totalSchools} icon={<SchoolIcon />} color="#2196f3" />
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={3}>
+                            <StatCard title="Total Students" value={summary?.totalStudents} icon={<PeopleIcon />} color="#4caf50" />
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={3}>
+                            <StatCard title="Total Transactions" value={summary?.totalTransactions} icon={<ReceiptIcon />} color="#ff9800" />
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={3}>
+                            <StatCard title="Total Recharge" value={`₹${summary?.totalRechargeAmount}`} icon={<MonetizationOnIcon />} color="#f44336" />
+                        </Grid>
+                    </Grid>
+                )}
+            </Box>
+        </SnackbarProvider>
+    );
 }
 
-export default Dashboard
+export default Dashboard;

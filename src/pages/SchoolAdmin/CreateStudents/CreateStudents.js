@@ -4,15 +4,13 @@ import {
   Typography,
   CircularProgress,
   Box,
-  Modal,
-  Fade,
 } from "@mui/material";
 import { FileUploadOutlined } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { usersData } from "../../../Api/auth";
-import { createStudent } from "../../../Api/student";
+import { createStudent, bulkCreateStudents } from "../../../Api/student";
 import { SnackbarProvider, enqueueSnackbar  } from "notistack";
 import AddIcon from '@mui/icons-material/Add';
 import StudentForm from "../../../Components/Student/CreateStudentDialog/CreateStudentDialog";
@@ -23,7 +21,6 @@ const CreateStudents = () => {
   const [csvData, setCsvData] = useState([]);
   const [loading, setLoading] = useState(false);
   const uploadInputRef = useRef(null);
-  const [successfulLeads, setSuccessfulLeads] = useState(0);
   const [open, setOpen] = React.useState(false);
   const user = JSON.parse(localStorage.getItem('user'))
 
@@ -43,7 +40,20 @@ const CreateStudents = () => {
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
+    if (!file) return;
+
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    
+    if (fileExtension === 'csv') {
+      // Handle CSV file
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const csvString = event.target.result;
+        parseCsvData(csvString);
+      };
+      reader.readAsText(file);
+    } else if (fileExtension === 'xls' || fileExtension === 'xlsx') {
+      // Handle Excel file
       const reader = new FileReader();
       reader.onload = (event) => {
         const result = event.target.result;
@@ -53,6 +63,8 @@ const CreateStudents = () => {
         parseCsvData(csvData);
       };
       reader.readAsBinaryString(file);
+    } else {
+      enqueueSnackbar({ message: 'Please upload a CSV or Excel file', variant: 'error' });
     }
   };
 
@@ -60,21 +72,88 @@ const CreateStudents = () => {
     setLoading(true);
     Papa.parse(csvString, {
       complete: (result) => {
-        const processedRows = result.data.map((row, index) => ({
-          id: `row_${index + 1}`,
-          name: row.name,
-          cardID: row.cardID,
-          school: schoolId,
-          balance : 0
-        }));
+        if (!result.data || result.data.length === 0) {
+          enqueueSnackbar({ message: 'No data found in file', variant: 'error' });
+          setLoading(false);
+          return;
+        }
+        
+        // Normalize the data by trimming keys and values
+        const normalizedData = result.data.map((row) => {
+          const normalizedRow = {};
+          Object.keys(row).forEach((key) => {
+            const trimmedKey = key.trim();
+            const value = row[key];
+            normalizedRow[trimmedKey] = typeof value === 'string' ? value.trim() : value;
+          });
+          return normalizedRow;
+        });
+
+        const processedRows = normalizedData.map((row, index) => {
+          // Extract contacts dynamically
+          const contacts = [];
+          let contactIndex = 1;
+          
+          while (row[`contact${contactIndex}Name`] || row[`contact${contactIndex}Phone`]) {
+            const contactName = row[`contact${contactIndex}Name`];
+            const contactPhone = row[`contact${contactIndex}Phone`];
+            const contactRelation = row[`contact${contactIndex}Relation`] || 'Parent';
+            
+            // Check if contact has valid data (not empty after trimming)
+            if (contactName && contactPhone && contactName !== '' && contactPhone !== '') {
+              contacts.push({
+                name: contactName.trim(),
+                phoneNumber: contactPhone.trim(),
+                relation: contactRelation.trim() || 'Parent'
+              });
+            }
+            contactIndex++;
+          }
+
+          // Extract recharge data
+          const rechargeAmount = row.rechargeAmount && row.rechargeAmount !== '' 
+            ? parseFloat(row.rechargeAmount) 
+            : null;
+          const rechargeType = row.rechargeType && row.rechargeType !== ''
+            ? row.rechargeType.trim().toLowerCase() 
+            : null;
+
+          return {
+            id: `row_${index + 1}`,
+            name: row.name ? row.name.trim() : '',
+            cardID: row.cardID ? row.cardID.trim() : '',
+            school: schoolId,
+            balance: 0,
+            contacts: contacts,
+            recharge: rechargeAmount && !isNaN(rechargeAmount) ? {
+              amount: rechargeAmount,
+              rechargeType: rechargeType || 'talktime'
+            } : null,
+            // For display purposes
+            contactsDisplay: contacts.length > 0 
+              ? contacts.map(c => `${c.name} (${c.relation})`).join(', ')
+              : 'No contacts',
+            rechargeDisplay: rechargeAmount && !isNaN(rechargeAmount)
+              ? `${rechargeAmount} (${rechargeType || 'talktime'})`
+              : 'No recharge'
+          };
+        });
   
+        // Filter out rows with missing required fields
         const filteredRows = processedRows.filter(
-          (row) => Object.values(row).every((value) => value !== undefined && value !== null && value !== "")
+          (row) => row.name && row.cardID && row.name !== '' && row.cardID !== ''
         );
-        setCsvData(filteredRows);
+
+        if (filteredRows.length === 0) {
+          enqueueSnackbar({ message: 'No valid rows found. Please check that name and cardID columns are present.', variant: 'error' });
+        } else {
+          setCsvData(filteredRows);
+        }
         setLoading(false);
       },
       header: true,
+      skipEmptyLines: true,
+      transformHeader: (header) => header.trim(), // Trim headers during parsing
     });
   };
 
@@ -89,38 +168,85 @@ const CreateStudents = () => {
   const handleDataSubmit = async () => {
     setLoading(true);
     try {
-      let successCount = 0;
-      let failedLeads = [];
+      // Structure data for bulk API
+      const studentsData = csvData.map((row) => {
+        const { id, school, contactsDisplay, rechargeDisplay, ...studentData } = row;
+        return {
+          name: studentData.name,
+          cardID: studentData.cardID,
+          school: schoolId,
+          balance: studentData.balance || 0,
+          contacts: studentData.contacts || [],
+          recharge: studentData.recharge || null
+        };
+      });
 
-      for (let lead of csvData) {
-        const { id, ...leadWithoutId } = lead;
-        leadWithoutId.school = schoolId;
-        try {
-          const response = await createStudent(leadWithoutId);
-          if (response.success) {
-            successCount++;
-          } else {
-            failedLeads.push(lead);
-          }
-        } catch (error) {
-          failedLeads.push(lead);
+      const response = await bulkCreateStudents(studentsData);
+      
+      if (response.data && response.data.data) {
+        const { summary, failed } = response.data.data;
+        
+        if (summary.successCount > 0) {
+          enqueueSnackbar({
+            message: `Successfully created ${summary.successCount} student(s)`,
+            variant: 'success'
+          });
         }
-        setSuccessfulLeads((prevCount) => prevCount + 1);
+        
+        if (summary.failureCount > 0) {
+          enqueueSnackbar({
+            message: `Failed to create ${summary.failureCount} student(s). Check console for details.`,
+            variant: 'warning'
+          });
+          console.log('Failed students:', failed);
+        }
+        
+        // Clear data if all successful, otherwise keep for review
+        if (summary.failureCount === 0) {
+          setCsvData([]);
+        }
+      } else {
+        enqueueSnackbar({ message: 'Bulk upload completed', variant: 'success' });
+        setCsvData([]);
       }
-      setCsvData([]); 
-      enqueueSnackbar({message:'Students Created', variant:'success'})
     } catch (error) {
-      enqueueSnackbar({message:error.message, variant:'error'})
-    } finally{
-      setTimeout(()=>{
-          setLoading(false);
-      }, 250)
+      console.error('Bulk upload error:', error);
+      enqueueSnackbar({
+        message: error.response?.data?.message || error.message || 'Failed to create students',
+        variant: 'error'
+      });
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 250);
     }
   };
 
   const columns = [
-    { field: 'name', headerName: 'Name', flex: 1 },
-    { field: 'cardID', headerName: 'Card ID', flex: 1 },
+    { field: 'name', headerName: 'Name', flex: 1, minWidth: 150 },
+    { field: 'cardID', headerName: 'Card ID', flex: 1, minWidth: 120 },
+    { 
+      field: 'contactsDisplay', 
+      headerName: 'Contacts', 
+      flex: 1, 
+      minWidth: 200,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+          {params.value || 'No contacts'}
+        </Typography>
+      )
+    },
+    { 
+      field: 'rechargeDisplay', 
+      headerName: 'Recharge', 
+      flex: 1, 
+      minWidth: 150,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+          {params.value || 'No recharge'}
+        </Typography>
+      )
+    },
   ];
   const rows = csvData;
   const onSubmit = async(data)=>{
@@ -132,7 +258,7 @@ const CreateStudents = () => {
       school : user.school
     }
     try {
-      const response = await createStudent(students)
+      await createStudent(students)
       enqueueSnackbar({message:'Student Created', variant:'success'})
     } catch (error) {
       enqueueSnackbar({message:  error.response.data.message, variant:'error'})
@@ -149,9 +275,9 @@ const CreateStudents = () => {
           minHeight: '90vh', ml: { md: '240px',sm: '240px',xs: '0px',lg: '240px',},backgroundColor: "#f7f7f8",p: 3}}>
       <Box sx={{ display: "flex", justifyContent: {lg :"flex-end", md:'flex-end'}, mb:3, width:'100%' }}>
           <Box  sx={{gap:2, display:'flex'}} >
-          <input  type="file" ref={uploadInputRef} onChange={handleFileUpload} accept=".xls, .xlsx" style={{ display: "none" }} />
+          <input  type="file" ref={uploadInputRef} onChange={handleFileUpload} accept=".xls, .xlsx, .csv" style={{ display: "none" }} />
       <Button onClick={handleUploadClick} variant="contained" color="primary" startIcon={<FileUploadOutlined />}>
-        Upload Excel
+        Upload File (CSV/Excel)
       </Button>
           <Button variant="contained" onClick={() => setOpen(true)} sx={{fontFamily: 'Poppins, sans-serif', ml:2}} startIcon={<AddIcon />}>
             Add Student

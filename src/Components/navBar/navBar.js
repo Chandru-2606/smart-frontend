@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
-import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import Toolbar from "@mui/material/Toolbar";
 import { Link, useLocation } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import { Collapse } from "@mui/material";
@@ -41,43 +39,48 @@ export default function Navbar({ data }) {
       ...prevOpen,
       [name]: !prevOpen[name],
     }));
-    setMobileViewOpen(false);
   };
 
   const handleItemClick = (name) => {
     setActiveItem(name);
+    if(mobileViewOpen){
+      setMobileViewOpen(false);
+    }
   };
 
   const responsiveDrawer = (
-    <div style={{ backgroundColor: "rgb(32,33,35)", height: "100%", fontFamily: 'Poppins, sans-serif' }}>
-       <img
-      src={logo}
-      style={{ maxWidth: '100%', height: 'auto', width: '50%', marginLeft:'30px' }}
-      alt="logo"
-    />
+    <Box sx={{ backgroundColor: 'primary.main', height: '100%', color: 'white' }}>
+      <Box sx={{ p: 2, textAlign: 'center' }}>
+        <img
+          src={logo}
+          style={{ maxWidth: '100%', height: 'auto', width: '50%' }}
+          alt="logo"
+        />
+      </Box>
       <List>
         {data.map((item, index) => (
           <div key={index}>
             <Link
               to={item.link || "#"}
-              style={{ textDecoration: "none", color: "white" }}
+              style={{ textDecoration: "none", color: "inherit" }}
             >
               <ListItemButton
                 sx={{
-                  color: activeItem === item.name ? "white" : "inherit",
-                  fontWeight: activeItem === item.name ? "bold" : "inherit",
-                  backgroundColor: activeItem === item.name && "#343541" ,
-                  borderRadius: "4px",
-                  width: "93%",
-                  marginLeft: "10px",
-                  marginRight:"10px"
+                  m: 1,
+                  borderRadius: 1,
+                  backgroundColor: activeItem === item.name ? 'primary.dark' : 'transparent',
+                  '&:hover': {
+                    backgroundColor: 'primary.dark',
+                  },
                 }}
                 onClick={() => {
-                  handleSubMenuToggle(item.name);
+                  if (item.children) {
+                    handleSubMenuToggle(item.name);
+                  }
                   handleItemClick(item.name);
                 }}
               >
-                <ListItemIcon sx={{ color: activeItem === item.name ? "#ecece6" : "#ecece6" }}>
+                <ListItemIcon sx={{ color: "white" }}>
                   {React.cloneElement(item.icon)}
                 </ListItemIcon>
                 <ListItemText primary={item.name} />
@@ -85,7 +88,6 @@ export default function Navbar({ data }) {
                   <IconButton
                     edge="end"
                     size="small"
-                    onClick={() => handleSubMenuToggle(item.name)}
                   >
                     <ArrowDropDownCircleOutlined htmlColor="white" />
                   </IconButton>
@@ -99,13 +101,16 @@ export default function Navbar({ data }) {
                     <Link
                       to={child.link}
                       key={childIndex}
-                      style={{ textDecoration: "none", color: "white" }}
+                      style={{ textDecoration: "none", color: "inherit" }}
                     >
                       <ListItemButton
                         sx={{
-                          color: "white",
                           pl: 4,
+                          '&:hover': {
+                            backgroundColor: 'primary.dark',
+                          },
                         }}
+                        onClick={() => handleItemClick(child.name)}
                       >
                         <ListItemIcon sx={{ color: "white" }}>
                           {React.cloneElement(child.icon)}
@@ -120,10 +125,8 @@ export default function Navbar({ data }) {
           </div>
         ))}
       </List>
-    </div>
+    </Box>
   );
-
-  // ...
 
   const container =
     window !== undefined ? () => window.document.body : undefined;
@@ -131,7 +134,6 @@ export default function Navbar({ data }) {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-
       <Box
         component="nav"
         sx={{
@@ -171,9 +173,9 @@ export default function Navbar({ data }) {
         width: { sm: `calc(100% - ${drawWidth}px)` },
       }}>
         <Appbar handleToggle={handleToggle} />
-        <Box sx={{mt : 1}}>
-        <Outlet />
-          
+        <Box sx={{ mt: 1 }}>
+          <Outlet />
+
         </Box>
       </Box>
     </Box>

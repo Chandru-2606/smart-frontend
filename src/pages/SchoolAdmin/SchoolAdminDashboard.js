@@ -11,6 +11,10 @@ import CreateStudents from './CreateStudents/CreateStudents';
 import Recharge from './Recharge/Recharge';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import Reports from './Reports';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import SettingsIcon from '@mui/icons-material/Settings';
+import Configuration from './Configuration';
 
 
 function SchoolAdminDashboard() {
@@ -20,6 +24,8 @@ function SchoolAdminDashboard() {
     { name: "Students", link: "students", icon: <PersonOutlineIcon />, component: < StudentList/> },
     { name: "Recharge", link: "recharge", icon: <CreditScoreIcon />, component: <Recharge /> },
     { name: "Transactions", link: "transactions", icon: <ReceiptLongIcon />, component: <Transactions /> },
+    { name: "Reports", link: "reports", icon: <AssessmentIcon />, component: <Reports /> },
+    { name: "Configuration", link: "configuration", icon: <SettingsIcon />, component: <Configuration /> },
   ];
 
   return (

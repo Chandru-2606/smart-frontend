@@ -14,6 +14,7 @@ import { grey } from '@mui/material/colors';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { useNavigate } from 'react-router-dom';
 import StudentList from '../../SchoolAdmin/Students/StudentList';
+import ConfirmationDialog from '../../../Components/ConfirmationDialog/ConfirmationDialog';
 
 
 const SchoolList = () => {
@@ -25,6 +26,8 @@ const SchoolList = () => {
   const containerRef = useRef(null);
   const [visible,setVisible] = useState(false)
   const [selectedSchooldata, setSelectedSchooldata] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [schoolToDelete, setSchoolToDelete] = useState(null);
 
 
   const fetchSchools = async () => {
@@ -62,15 +65,20 @@ const SchoolList = () => {
     setSelectedSchool(null);
   };
 
-  const handleDelete = async (schoolId) => {
+  const handleDelete = async () => {
+    if (!schoolToDelete) return;
+    
+    setDeleteDialogOpen(false);
     try {
-      const response = await deleteSchool(schoolId);
+      const response = await deleteSchool(schoolToDelete._id);
       if (response.status === 204) {
         enqueueSnackbar({message:'School Deleted', variant:'success'})
         fetchSchools();
       }
     } catch (error) {
-      enqueueSnackbar({message:error.response.data.message, variant:'error'})
+      enqueueSnackbar({message:error.response?.data?.message || 'Failed to delete school', variant:'error'})
+    } finally {
+      setSchoolToDelete(null);
     }
   };
 
@@ -122,7 +130,10 @@ const SchoolList = () => {
            color="primary">
             <EditIcon />
           </IconButton>
-          <IconButton onClick={() => handleDelete(params.row?._id)} color="error">
+          <IconButton onClick={() => {
+            setSchoolToDelete(params.row);
+            setDeleteDialogOpen(true);
+          }} color="error">
             <DeleteIcon />
           </IconButton>
           <IconButton>
@@ -221,6 +232,19 @@ const SchoolList = () => {
                 isCreateMode={isCreateMode}
                 selectedSchool={selectedSchool}
               />
+        <ConfirmationDialog
+          open={deleteDialogOpen}
+          onClose={() => {
+            setDeleteDialogOpen(false);
+            setSchoolToDelete(null);
+          }}
+          onConfirm={handleDelete}
+          title="Confirm Delete School"
+          message={`Are you sure you want to delete school "${schoolToDelete?.name}"? This action cannot be undone.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          type="delete"
+        />
         <Loader loading={loading} />
       </SnackbarProvider>
     </>
